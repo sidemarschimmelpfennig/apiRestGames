@@ -1,15 +1,15 @@
+require("dotenv").config()
 const express = require('express')
 const bodyParser = require('body-parser')
 const app = express()
 const cors = require('cors')
-const { v4: uuidv4 }= require('uuid')
-const jwt = require("jsonwebtoken")
+
+
+
 
 app.use(cors())
 app.use(bodyParser.urlencoded({extended : false}))
 app.use(bodyParser.json())
-
-const JWTSecret = "jwtSECRET"
 
 
 
@@ -77,7 +77,6 @@ function auth(req, res, next){
   
 }
 
-
 app.get('/games', auth ,(req, res)=>{
     res.statusCode = 200
     res.json(DB.games)
@@ -100,7 +99,7 @@ app.get('/games/:id' ,(req, res)=>{
     }
 })
 
-app.post('/game' ,(req, res)=>{
+app.post('/game', auth ,(req, res)=>{
     let { title , year, price} = req.body
     let id = uuidv4()
     let game = ({
@@ -113,7 +112,7 @@ app.post('/game' ,(req, res)=>{
     res.sendStatus(200)
 })
 
-app.delete("/game/:id",(req, res)=>{
+app.delete("/game/:id", auth,(req, res)=>{
     let game = parseInt(req.params.id)
     if(isNaN(req.params.id)){
         res.sendStatus(400)
@@ -129,7 +128,7 @@ app.delete("/game/:id",(req, res)=>{
     }
 })
 
-app.put("/game/:id", (req, res)=>{
+app.put("/game/:id", auth, (req, res)=>{
     const {id} = req.params
     if(isNaN(id)){
         res.sendStatus(400)
@@ -177,6 +176,7 @@ app.post("/auth",(req, res) => {
             }else{
                 res.status(401);
                 res.json({err: "Credenciais inválidas!"});
+ 
             }
         }else{
             res.status(404);
@@ -188,7 +188,6 @@ app.post("/auth",(req, res) => {
         res.send({err: "O E-mail enviado é inválido"});
     }
 });
-
 
 app.listen(3200, ()=>{
     console.log('teste')
